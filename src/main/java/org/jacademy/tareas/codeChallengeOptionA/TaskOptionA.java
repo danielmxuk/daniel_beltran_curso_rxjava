@@ -5,11 +5,11 @@
  */
 package org.jacademy.tareas.codeChallengeOptionA;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-
-import rx.Observable;
-import rx.Subscription;
 import rx.observables.ConnectableObservable;
 
 /**
@@ -28,26 +28,39 @@ public class TaskOptionA {
         mensajes.add("Multiplica 3 5");
         mensajes.add("Otra cosa");
         
-        //ConnectableObservable<String> observable = ConnectableObservable.from(mensajes).publish(); // connectableObservable
-        ConnectableObservable<String> observable = ConnectableObservable.from(mensajes).publish(); // connectableObservable
+        //Usando Observable simple: Observable<String> observable = Observable.from(mensajes);
+        //Usando ConnectableObservable simple: ConnectableObservable<String> observable = ConnectableObservable.from(mensajes).publish();
+        
+        //Usando lectura desde el teclado
+        ConnectableObservable<String> observable = ConnectableObservable.<String>create(s -> {
+        		
+        		while (!s.isUnsubscribed()){
+        			String captura = leerDesdeTeclado();
+        			if(captura.matches("Salir")) {
+        				s.unsubscribe();
+        			}else {
+        				s.onNext(captura);
+        			}
+        		}
+        	
+        	}).publish();
         
         
-        Subscription subscriptionImprime = observable.subscribe(
+        // Subscription subscriptionImprime
+        observable.subscribe(
                 s -> {
-                   System.out.println("lll");
+                	if (s.startsWith("Imprime ")) {
+                		imprimeEnConsola(s, s.replaceAll("^Imprime ", ""));
+                	}
                 },
-                (t) -> System.out.println("ERROR: " + t),
+                t -> System.out.println("ERROR: " + t),
                 () -> System.out.println("Esto se termino bien")
         );
         
-        if (!subscriptionImprime.isUnsubscribed()){
-        	subscriptionImprime.unsubscribe();
-            System.out.println("La subscripcion seguia");
-        }
         
-        /*
-        Subscription subscriptionSuma = observable.subscribe(
-                (s) -> {
+        // Subscription subscriptionSuma 
+        observable.subscribe(
+                s -> {
                     if (s.startsWith("Suma ")) {
                     	String[] tempArray = s.split(" ");
                     	String salida = "Parametros invalidos";
@@ -66,8 +79,9 @@ public class TaskOptionA {
                 }
         );
         
-        Subscription subscriptionResta = observable.subscribe(
-                (s) -> {
+        //Subscription subscriptionResta 
+        observable.subscribe(
+                s -> {
                     if (s.startsWith("Resta ")) {
                     	String[] tempArray = s.split(" ");
                     	String salida = "Parametros invalidos";
@@ -86,8 +100,9 @@ public class TaskOptionA {
                 }
         );
         
-        Subscription subscriptionMultiplica = observable.subscribe(
-                (s) -> {
+        //Subscription subscriptionMultiplica
+        observable.subscribe(
+                s -> {
                     if (s.startsWith("Multiplica ")) {
                     	String[] tempArray = s.split(" ");
                     	String salida = "Parametros invalidos";
@@ -105,18 +120,39 @@ public class TaskOptionA {
                     }
                 }
         );
-        */
-        System.out.println("\n\nEmpezando. \n");
         
-        //observable.connect();
+     // Subscription subscriptionNoConozcoLaOpcion
+        observable.subscribe(
+                s -> {
+                	if (!s.matches("(Imprime |Suma |Resta |Multiplica ).*")) {
+                		imprimeEnConsola(s, "No conozco ese comando!");
+                	}
+                }
+        );
+        
+        System.out.println("\n\nEmpezando. (NOTA: escribe  \"Salir\" para terminar la ejecucion)\n");
+        
+        observable.connect();
         
         System.out.println("\n\nTermino. \n");
     }
     
     private static void imprimeEnConsola(String entrada, String salida) {
     	
-    	System.out.println("Entrada: " + entrada);
-        System.out.println("Salida:  " + salida);
+    	System.out.println("     -> Entrada: " + entrada);
+        System.out.println("     -> Salida:  " + salida);
         System.out.println("\n-------------------------------------\n");
+    }
+    
+    private static String leerDesdeTeclado() {
+    	BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        System.out.print("Escribe comando: ");
+        String s = "";
+        try{
+        	s = br.readLine();
+        }catch(IOException e){
+            System.err.println("Hubo un problema!!!!");
+        }
+        return s;
     }
 }
