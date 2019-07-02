@@ -3,7 +3,7 @@
  * @Author: Daniel Beltran (db077a)
  * @Date: Jun 4, 2019
  */
-package org.jacademy.tareas.codeChallengeOptionA;
+package org.jacademy.tareas.session05.codeChallengeOptionA;
 
 import java.io.BufferedReader;
 import java.io.IOException;

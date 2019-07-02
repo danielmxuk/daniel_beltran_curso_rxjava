@@ -1,20 +1,24 @@
 /**
  * @Description: 
  * @Author: Daniel Beltran (db077a)
- * @Date: May 14, 2019
+ * @Date: May 21, 2019
  */
-package org.jacademy.tareas.session03;
+package org.jacademy.tareas.session04;
 
 import java.text.MessageFormat;
-import rx.Observable;
+import org.jacademy.tareas.session03.NewsSubscriber01ClaseNoticias;
+import org.jacademy.tareas.session03.NewsSubscriber01ClaseTipoNoticias;
+import org.jacademy.tareas.session03.NewsSubscriber01GeneradorDeNoticias;
+
+import rx.observables.ConnectableObservable;
 import rx.Subscriber;
 
 /**
  * @Description: 
  * @Author: Daniel Beltran (db077a)
- * @Date: May 14, 2019
+ * @Date: May 21, 2019
  */
-public class NewsSubscriber01 {
+public class NewsSubscriber02 {
 	
 	private static final String SUSCRIPTOR_1 = "Suscriptor #1";
 	private static final String SUSCRIPTOR_2 = "Suscriptor #2";
@@ -26,7 +30,12 @@ public class NewsSubscriber01 {
 		
 		System.out.println("Empezando clase NewsSubscriber02...\n");
 		
-		Observable<NewsSubscriber01ClaseNoticias> observable = Observable.from( NewsSubscriber01GeneradorDeNoticias.CreaNoticias() );
+		//Observable<NewsSubscriber01ClaseNoticias> observable = Observable.from( NewsSubscriber01GeneradorDeNoticias.CreaNoticias() );
+		
+		ConnectableObservable<NewsSubscriber01ClaseNoticias> observable = ConnectableObservable
+																			.<NewsSubscriber01ClaseNoticias>from( 
+																					NewsSubscriber01GeneradorDeNoticias.CreaNoticias() )
+																			.publish();
 		
 		Subscriber<NewsSubscriber01ClaseNoticias> subscriptor01 = getSuscriptor(SUSCRIPTOR_1);
 		Subscriber<NewsSubscriber01ClaseNoticias> subscriptor02 = getSuscriptor(SUSCRIPTOR_2);
@@ -39,6 +48,8 @@ public class NewsSubscriber01 {
 		observable.subscribe(subscriptor03);
 		observable.subscribe(subscriptor04);
 		observable.subscribe(subscriptor05);
+		
+		observable.connect();
 		
 		System.out.println("\nClase NewsSubscriber02 terminada.");
 	}
